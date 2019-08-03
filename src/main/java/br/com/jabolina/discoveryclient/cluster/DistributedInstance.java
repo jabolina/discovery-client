@@ -4,15 +4,15 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 
-public interface DistributedInstance {
+public interface DistributedInstance<K, V> {
 
     boolean isLeader();
     boolean isRunning();
 
     Lock getLock( String name );
 
-    < K, V > ConcurrentMap< K, V > getMap( String name );
-    < K >BlockingQueue< K > getQueue( String name );
+    ConcurrentMap< K, V > getMap( String name );
+    BlockingQueue< V > getQueue( String name );
 
     void destroy();
 }

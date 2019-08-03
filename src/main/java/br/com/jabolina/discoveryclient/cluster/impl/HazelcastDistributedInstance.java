@@ -6,23 +6,20 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.Member;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 
-public class HazelcastDistributedInstance implements DistributedInstance {
+public class HazelcastDistributedInstance< K, V > implements DistributedInstance< K, V > {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( HazelcastDistributedInstance.class );
 
     private final HazelcastInstance instance;
 
-    @Autowired
     public HazelcastDistributedInstance( HazelcastInstance instance ) {
         this.instance = instance;
     }
-
 
     @Override
     public boolean isLeader() {
@@ -41,12 +38,12 @@ public class HazelcastDistributedInstance implements DistributedInstance {
     }
 
     @Override
-    public < K, V > ConcurrentMap< K, V > getMap( String name ) {
+    public ConcurrentMap< K, V > getMap( String name ) {
         return instance.getMap( name );
     }
 
     @Override
-    public < K > BlockingQueue< K > getQueue( String name ) {
+    public BlockingQueue< V > getQueue( String name ) {
         return instance.getQueue( name );
     }
 

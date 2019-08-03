@@ -1,10 +1,11 @@
 package br.com.jabolina.discoveryclient.configuration;
 
+import br.com.jabolina.discoveryclient.cluster.DistributedInstance;
+import br.com.jabolina.discoveryclient.cluster.impl.HazelcastDistributedInstance;
 import br.com.jabolina.discoveryclient.cluster.impl.MapEntryListener;
 import br.com.jabolina.discoveryclient.cluster.impl.MemberListener;
 import br.com.jabolina.discoveryclient.util.Constants;
 import com.hazelcast.config.*;
-import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.MembershipListener;
 import com.hazelcast.instance.HazelcastInstanceFactory;
 import org.slf4j.Logger;
@@ -69,13 +70,13 @@ public class HazelcastConfiguration {
 
         config.setMemberAttributeConfig( memberAttributeConfig( config.getInstanceName() ) );
         config.addListenerConfig( new ListenerConfig( membershipListener() ) );
-        config.getMapConfigs().put( Constants.HAZELCAST_PARTICIPANT_MAP, initializeServicesMapConfig() );
+        config.getMapConfigs().put( Constants.HAZEL_MAP_SERVICES, initializeServicesMapConfig() );
 
         return config;
     }
 
     @Bean( name = "custom-hazelcast" )
-    public HazelcastInstance hazelcastInstance() {
-        return HazelcastInstanceFactory.newHazelcastInstance( config() );
+    public DistributedInstance hazelcastInstance() {
+        return new HazelcastDistributedInstance( HazelcastInstanceFactory.newHazelcastInstance( config() ) );
     }
 }

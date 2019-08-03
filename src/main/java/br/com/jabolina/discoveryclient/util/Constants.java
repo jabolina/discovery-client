@@ -5,5 +5,7 @@ public final class Constants {
     private Constants() { }
 
     public static final String HAZELCAST_MEMBER_PREFIX = "hazel-member";
-    public static final String HAZELCAST_PARTICIPANT_MAP = "hazel-map-participant";
+    public static final String HAZEL_MAP_SERVICES = "hazel-map-services";
+    public static final String HAZEL_QUEUE_SERVICES = "hazel-queue-services-";
+
 }
