@@ -2,8 +2,6 @@ package br.com.jabolina.discoveryclient.controller;
 
 import br.com.jabolina.discoveryclient.data.ServiceDescription;
 import br.com.jabolina.discoveryclient.service.ServiceGenericService;
-import br.com.jabolina.discoveryclient.util.Constants;
-import br.com.jabolina.discoveryclient.util.EncDec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,24 +34,21 @@ public class ServicesController {
     @PostMapping( "/subscribe" )
     public @ResponseBody
     ResponseEntity< ServiceDescription > subscribeService( @RequestBody ServiceDescription description ) {
-        description.setId( EncDec.jid( description.getName(), Constants.HAZEL_QUEUE_SERVICES ) );
         LOGGER.info( "Registering new service [{}]", service );
 
         if ( service.subscribe( description ) ) {
             return ResponseEntity.ok( description );
         }
 
-        description.setId( "" );
+        description.setId( "" ).setEnabled( false );
         return ResponseEntity.status( HttpStatus.REQUEST_TIMEOUT ).body( null );
     }
 
     @GetMapping( "/unsubscribe" )
     public @ResponseBody
-    ResponseEntity< ServiceDescription > unsubscribeService( @RequestParam String id ) {
+    ResponseEntity< Boolean > unsubscribeService( @RequestParam String id ) {
         LOGGER.info( "Unsubscribing service with id [{}]", id );
-
-        service.unsubscribe( id );
-        return ResponseEntity.ok( new ServiceDescription().setId( id ) );
+        return ResponseEntity.ok( service.unsubscribe( id ) );
     }
 
 }

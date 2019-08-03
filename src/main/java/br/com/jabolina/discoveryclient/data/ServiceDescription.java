@@ -1,12 +1,14 @@
 package br.com.jabolina.discoveryclient.data;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class ServiceDescription implements Serializable {
 
     private String id;
     private String name;
     private String baseUrl;
+    private boolean enabled;
 
     public String getId() {
         return id;
@@ -35,12 +37,43 @@ public class ServiceDescription implements Serializable {
         return this;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public ServiceDescription setEnabled( boolean enabled ) {
+        this.enabled = enabled;
+        return this;
+    }
+
+    public boolean disable() {
+        this.enabled = false;
+        return true;
+    }
+
+    @Override
+    public boolean equals( Object o ) {
+        if ( o instanceof String ) return enabled && o.equals( id );
+        if ( this == o ) return true;
+        if ( o == null || getClass() != o.getClass() ) return false;
+        ServiceDescription that = (ServiceDescription) o;
+        return Objects.equals( id, that.id ) &&
+                Objects.equals( name, that.name ) &&
+                Objects.equals( baseUrl, that.baseUrl );
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash( id, name, baseUrl );
+    }
+
     @Override
     public String toString() {
         return "ServiceDescription{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", baseUrl='" + baseUrl + '\'' +
+                ", enabled=" + enabled +
                 '}';
     }
 }
