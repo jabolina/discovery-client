@@ -18,6 +18,7 @@ public class MemberListener implements MembershipListener {
     @Override
     public void memberAdded( MembershipEvent membershipEvent ) {
         LOGGER.info( "New member arrived [{}]", membershipEvent );
+
     }
 
     @Override

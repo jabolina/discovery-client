@@ -4,12 +4,12 @@ import br.com.jabolina.discoveryclient.cluster.impl.MapEntryListener;
 import br.com.jabolina.discoveryclient.cluster.impl.MemberListener;
 import br.com.jabolina.discoveryclient.util.Constants;
 import com.hazelcast.config.*;
-import com.hazelcast.core.EntryListener;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.MembershipListener;
 import com.hazelcast.instance.HazelcastInstanceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +22,9 @@ import java.util.UUID;
 public class HazelcastConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( HazelcastConfiguration.class );
+
+    @Value( "${discovery.address.ip:localhost}" )
+    private String clusterAddress;
 
     private MemberAttributeConfig memberAttributeConfig( String instance ) {
         MemberAttributeConfig memberConfig = new MemberAttributeConfig();
@@ -61,7 +64,8 @@ public class HazelcastConfiguration {
 
         config.getNetworkConfig().getJoin().getAwsConfig().setEnabled( false );
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled( false );
-        config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled( true );
+        config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled( true )
+                .addMember( clusterAddress );
 
         config.setMemberAttributeConfig( memberAttributeConfig( config.getInstanceName() ) );
         config.addListenerConfig( new ListenerConfig( membershipListener() ) );
