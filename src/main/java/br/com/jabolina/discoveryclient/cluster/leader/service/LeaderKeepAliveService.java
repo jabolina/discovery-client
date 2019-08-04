@@ -7,9 +7,15 @@ import com.hazelcast.core.ILock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -17,17 +23,44 @@ public class LeaderKeepAliveService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( LeaderKeepAliveService.class );
 
+    private static final Long VERIFY_RATE = 60L;
+    private static final Long START_DELAY = 10L;
+    private static final String SERVICE_HEALTH_PATH = "/discovery/health";
+
+    private final ScheduledExecutorService executorService;
     private final DistributedInstance< ?, ?, ? extends ServiceDescription > distributedInstance;
+    private final RestTemplate restTemplate;
 
     @Autowired
-    public LeaderKeepAliveService( DistributedInstance< ?, ?, ? > distributedInstance ) {
+    public LeaderKeepAliveService(
+            DistributedInstance< ?, ?, ? > distributedInstance,
+            RestTemplate restTemplate
+    ) {
         this.distributedInstance = distributedInstance;
+        this.restTemplate = restTemplate;
+
+        this.executorService = Executors.newScheduledThreadPool( 1 );
     }
 
-    private < T extends ServiceDescription > void verifyService( T service ) {
+    private < S extends ServiceDescription > S verifyService( S service ) {
+        try {
+            ResponseEntity< S > res = restTemplate.exchange(
+                    service.getBaseUrl() + SERVICE_HEALTH_PATH,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference< S >() { }
+            );
+
+            LOGGER.info( "Service verification response [{}]", res );
+            service.setEnabled( true );
+        } catch ( Exception ex ) {
+            service.setEnabled( false );
+        }
+
+        return service;
     }
 
-    public void startServicesVerification() {
+    private void keepAlive() {
         if ( distributedInstance.isLeader() ) {
             ILock lock = null;
 
@@ -36,10 +69,9 @@ public class LeaderKeepAliveService {
                 lock.tryLock(  5L, TimeUnit.SECONDS );
 
                 if ( lock.isLocked() ) {
-                    LOGGER.info( "Leader starting services verifications, instance [{}]", distributedInstance );
-
                     distributedInstance.getQueue( Constants.HAZEL_QUEUE_SERVICES ).parallelStream()
-                            .forEach( this::verifyService );
+                            .map( this::verifyService )
+                            .forEach( service -> LOGGER.info( "Service status [{}]", service ) );
                 }
             } catch ( Exception ex ) {
                 LOGGER.error( "Error verifying services", ex );
@@ -49,5 +81,15 @@ public class LeaderKeepAliveService {
                 }
             }
         }
+    }
+
+    public void startServicesVerification() {
+        LOGGER.info( "Leader starting services verifications, instance [{}]", distributedInstance );
+        executorService.scheduleAtFixedRate(
+                this::keepAlive,
+                START_DELAY,
+                VERIFY_RATE,
+                TimeUnit.SECONDS
+        );
     }
 }

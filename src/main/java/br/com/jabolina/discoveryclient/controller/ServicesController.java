@@ -34,7 +34,7 @@ public class ServicesController {
     @PostMapping( "/subscribe" )
     public @ResponseBody
     ResponseEntity< ServiceDescription > subscribeService( @RequestBody ServiceDescription description ) {
-        LOGGER.info( "Registering new service [{}]", service );
+        LOGGER.info( "Registering new service [{}]", description );
 
         if ( service.subscribe( description ) ) {
             return ResponseEntity.ok( description );
