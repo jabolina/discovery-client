@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
 @Service
 public class ServiceDescriptionServiceImpl< V extends ServiceDescription > implements ServiceGenericService< V > {
 
-    private final DistributedInstance< String, V > instance;
+    private final DistributedInstance< ?, String, V > instance;
 
     @Autowired
-    public ServiceDescriptionServiceImpl( DistributedInstance< String, V > instance ) {
+    public ServiceDescriptionServiceImpl( DistributedInstance< ?, String, V > instance ) {
        this.instance = instance;
     }
 

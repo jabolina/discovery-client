@@ -3,7 +3,6 @@ package br.com.jabolina.discoveryclient.cluster.impl;
 import br.com.jabolina.discoveryclient.cluster.DistributedInstance;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.Member;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,25 +10,40 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 
-public class HazelcastDistributedInstance< K, V > implements DistributedInstance< K, V > {
+public class HazelcastDistributedInstance< K, V > implements DistributedInstance< HazelcastInstance, K, V > {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( HazelcastDistributedInstance.class );
 
     private final HazelcastInstance instance;
+    private boolean leader;
 
     public HazelcastDistributedInstance( HazelcastInstance instance ) {
         this.instance = instance;
     }
 
     @Override
+    public HazelcastInstance retrieveInstance() {
+        return instance;
+    }
+
+    @Override
+    public void elected() {
+        leader = true;
+    }
+
+    @Override
     public boolean isLeader() {
-        Member latest = instance.getCluster().getMembers().iterator().next();
-        return latest.localMember();
+        return leader;
     }
 
     @Override
     public boolean isRunning() {
         return instance.getLifecycleService().isRunning();
+    }
+
+    @Override
+    public void yield() {
+
     }
 
     @Override
