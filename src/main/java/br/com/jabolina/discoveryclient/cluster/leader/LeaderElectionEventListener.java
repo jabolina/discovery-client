@@ -36,5 +36,6 @@ public class LeaderElectionEventListener {
     @EventListener( OnRevokedEvent.class )
     public void leaderRevoked( OnRevokedEvent event ) {
         LOGGER.info( "Instance leader revoked: [{}]", event );
+        keepAliveService.stop();
     }
 }

@@ -83,6 +83,16 @@ public class LeaderKeepAliveService {
         }
     }
 
+    public void stop() {
+        if ( !Objects.isNull( executorService )
+                && !executorService.isShutdown()
+                && !executorService.isTerminated() ) {
+
+            LOGGER.info( "Canceling leader keep alive service" );
+            executorService.shutdownNow();
+        }
+    }
+
     public void startServicesVerification() {
         LOGGER.info( "Leader starting services verifications, instance [{}]", distributedInstance );
         executorService.scheduleAtFixedRate(
