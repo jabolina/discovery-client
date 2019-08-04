@@ -1,16 +1,17 @@
 package br.com.jabolina.discoveryclient.cluster.impl;
 
 import br.com.jabolina.discoveryclient.cluster.DistributedInstance;
-import com.hazelcast.core.Hazelcast;
+import br.com.jabolina.discoveryclient.data.ServiceDescription;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.ILock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PreDestroy;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.Lock;
 
-public class HazelcastDistributedInstance< K, V > implements DistributedInstance< HazelcastInstance, K, V > {
+public class HazelcastDistributedInstance< K, V extends ServiceDescription > implements DistributedInstance< HazelcastInstance, K, V > {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( HazelcastDistributedInstance.class );
 
@@ -42,12 +43,7 @@ public class HazelcastDistributedInstance< K, V > implements DistributedInstance
     }
 
     @Override
-    public void yield() {
-
-    }
-
-    @Override
-    public Lock getLock( String name ) {
+    public ILock getLock( String name ) {
         return instance.getLock( name );
     }
 
@@ -61,8 +57,9 @@ public class HazelcastDistributedInstance< K, V > implements DistributedInstance
         return instance.getQueue( name );
     }
 
+    @PreDestroy
     @Override
     public void destroy() {
-        Hazelcast.shutdownAll();
+        instance.shutdown();
     }
 }

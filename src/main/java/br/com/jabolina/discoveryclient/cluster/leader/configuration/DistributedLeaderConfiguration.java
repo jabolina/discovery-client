@@ -13,17 +13,17 @@ import org.springframework.integration.support.locks.LockRegistry;
 
 @Configuration
 @DependsOn( "custom-hazelcast" )
-public class HazelcastLeaderElectionConfiguration {
+public class DistributedLeaderConfiguration {
 
     private final DistributedInstance< HazelcastInstance, ?, ? > distributedInstance;
 
     @Autowired
-    public HazelcastLeaderElectionConfiguration( DistributedInstance< HazelcastInstance, ?, ? > distributedInstance ) {
+    public DistributedLeaderConfiguration( DistributedInstance< HazelcastInstance, ?, ? > distributedInstance ) {
         this.distributedInstance = distributedInstance;
     }
 
     @Bean
-    public LockRegistry lockRegistry(  ) {
+    public LockRegistry lockRegistry() {
         return new HazelcastLockRegistry(
                 distributedInstance.retrieveInstance()
         );

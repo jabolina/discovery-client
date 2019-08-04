@@ -1,6 +1,7 @@
 package br.com.jabolina.discoveryclient.cluster.leader;
 
 import br.com.jabolina.discoveryclient.cluster.DistributedInstance;
+import br.com.jabolina.discoveryclient.cluster.leader.service.LeaderKeepAliveService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +15,22 @@ public class LeaderElectionEventListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( LeaderElectionEventListener.class );
     private final DistributedInstance< ?, ?, ? > distributedInstance;
+    private final LeaderKeepAliveService keepAliveService;
 
     @Autowired
-    public LeaderElectionEventListener( DistributedInstance< ?, ?, ? > distributedInstance ) {
+    public LeaderElectionEventListener(
+            DistributedInstance< ?, ?, ? > distributedInstance,
+            LeaderKeepAliveService keepAliveService
+    ) {
         this.distributedInstance = distributedInstance;
+        this.keepAliveService = keepAliveService;
     }
 
     @EventListener( OnGrantedEvent.class )
     public void leaderElected( OnGrantedEvent event ) {
         LOGGER.info( "New instance leader elected: [{}]", event );
         distributedInstance.elected();
+        keepAliveService.startServicesVerification();
     }
 
     @EventListener( OnRevokedEvent.class )
