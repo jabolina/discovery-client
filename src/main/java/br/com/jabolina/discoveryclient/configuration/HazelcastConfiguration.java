@@ -27,6 +27,9 @@ public class HazelcastConfiguration {
     @Value( "${discovery.address.ip:localhost}" )
     private String clusterAddress;
 
+    @Value( "${discovery.cluster.size:1}" )
+    private String clusterSize;
+
     private MemberAttributeConfig memberAttributeConfig( String instance ) {
         MemberAttributeConfig memberConfig = new MemberAttributeConfig();
         memberConfig.setStringAttribute( Constants.HAZELCAST_MEMBER_PREFIX, instance );
@@ -45,7 +48,8 @@ public class HazelcastConfiguration {
 
     private MapConfig initializeServicesMapConfig() {
         return new MapConfig()
-                .setBackupCount( 1 )
+                .setBackupCount( Integer.parseInt( clusterSize, 10 ) )
+                .setReadBackupData( true )
                 .setEvictionPolicy( EvictionPolicy.LRU )
                 .setStatisticsEnabled( true )
                 .setTimeToLiveSeconds( 0 )

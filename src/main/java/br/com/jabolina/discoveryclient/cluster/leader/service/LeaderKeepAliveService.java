@@ -3,7 +3,6 @@ package br.com.jabolina.discoveryclient.cluster.leader.service;
 import br.com.jabolina.discoveryclient.cluster.DistributedInstance;
 import br.com.jabolina.discoveryclient.data.ServiceDescription;
 import br.com.jabolina.discoveryclient.util.Constants;
-import com.hazelcast.core.ILock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Objects;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 
 @Service
 public class LeaderKeepAliveService {
@@ -28,7 +29,7 @@ public class LeaderKeepAliveService {
     private static final String SERVICE_HEALTH_PATH = "/discovery/health";
 
     private final ScheduledExecutorService executorService;
-    private final DistributedInstance< ?, ?, ? extends ServiceDescription > distributedInstance;
+    private final DistributedInstance distributedInstance;
     private final RestTemplate restTemplate;
 
     @Autowired
@@ -60,24 +61,27 @@ public class LeaderKeepAliveService {
         return service;
     }
 
-    private void keepAlive() {
+    @SuppressWarnings( "unchecked" )
+    private <S extends ServiceDescription> void keepAlive() {
         if ( distributedInstance.isLeader() ) {
-            ILock lock = null;
+            boolean locked = false;
+            Lock lock = null;
 
             try {
                 lock = distributedInstance.getLock( Constants.HAZEL_LOCK_VERIFY );
-                lock.tryLock(  5L, TimeUnit.SECONDS );
+                locked = lock.tryLock(  5L, TimeUnit.SECONDS );
 
-                if ( lock.isLocked() ) {
-                    distributedInstance.getQueue( Constants.HAZEL_QUEUE_SERVICES ).parallelStream()
-                            .map( this::verifyService )
-                            .forEach( service -> LOGGER.info( "Service status [{}]", service ) );
+                if ( locked ) {
+                    ConcurrentMap< String, S > map = distributedInstance.getMap( Constants.HAZEL_MAP_SERVICES );
+                    map.entrySet().parallelStream()
+                            .map( entry -> this.verifyService( entry.getValue() ) )
+                            .forEach( s -> map.replace( s.getId(), s ) );
                 }
             } catch ( Exception ex ) {
                 LOGGER.error( "Error verifying services", ex );
             } finally {
-                if ( !Objects.isNull( lock ) ) {
-                    lock.forceUnlock();
+                if ( !Objects.isNull( lock ) && locked ) {
+                    lock.unlock();
                 }
             }
         }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -39,26 +40,32 @@ public class ServiceDescriptionServiceImpl< V extends ServiceDescription > imple
         return false;
     }
 
+    private boolean offer( V description ) {
+        instance.getMap( Constants.HAZEL_MAP_SERVICES )
+                .put( description.getId(), description );
+        return true;
+    }
+
     @Override
     public List< V > listServices() {
-        return instance.getQueue( Constants.HAZEL_QUEUE_SERVICES )
-                .parallelStream()
-                .filter( ServiceDescription::isEnabled )
+        return instance.getMap( Constants.HAZEL_MAP_SERVICES ).entrySet().parallelStream()
+                .filter( entry -> entry.getValue().isEnabled() )
+                .map( Map.Entry::getValue )
                 .collect( Collectors.toList() );
     }
 
 
     @Override
     public boolean subscribe( V service ) {
-        service.setId( EncDec.jid( service.getName(), Constants.HAZEL_QUEUE_SERVICES ) )
+        service.setId( EncDec.jid( service.getName(), Constants.HAZEL_MAP_SERVICES ) )
                 .setEnabled( true );
-        return offer( service, 1L, 3  );
+        return offer( service );
     }
 
     @Override
     public boolean unsubscribe( String identifier ) {
-        return instance.getQueue( Constants.HAZEL_QUEUE_SERVICES ).parallelStream()
-                .filter( s -> s.getId().equals( identifier ) )
-                .allMatch( ServiceDescription::disable );
+        V service = instance.getMap( Constants.HAZEL_MAP_SERVICES ).get( identifier );
+        service.disable();
+        return instance.getMap( Constants.HAZEL_MAP_SERVICES ).replace( identifier, service ) != null;
     }
 }

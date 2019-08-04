@@ -4,6 +4,7 @@ import br.com.jabolina.discoveryclient.cluster.DistributedInstance;
 import br.com.jabolina.discoveryclient.data.ServiceDescription;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ILock;
+import com.hazelcast.core.IMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,7 @@ public class HazelcastDistributedInstance< K, V extends ServiceDescription > imp
     }
 
     @Override
-    public ConcurrentMap< K, V > getMap( String name ) {
+    public IMap< K, V > getMap( String name ) {
         return instance.getMap( name );
     }
 
