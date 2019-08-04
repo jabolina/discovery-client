@@ -64,6 +64,7 @@ public class ServiceDescriptionServiceImpl< V extends ServiceDescription > imple
 
     @Override
     public boolean unsubscribe( String identifier ) {
+        // Thread safe?
         V service = instance.getMap( Constants.HAZEL_MAP_SERVICES ).get( identifier );
         service.disable();
         return instance.getMap( Constants.HAZEL_MAP_SERVICES ).replace( identifier, service ) != null;
