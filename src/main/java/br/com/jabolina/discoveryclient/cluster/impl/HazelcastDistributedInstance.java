@@ -5,12 +5,14 @@ import br.com.jabolina.discoveryclient.data.ServiceDescription;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ILock;
 import com.hazelcast.core.IMap;
+import com.hazelcast.core.IQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PreDestroy;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 public class HazelcastDistributedInstance< K, V extends ServiceDescription > implements DistributedInstance< HazelcastInstance, K, V > {
@@ -75,7 +77,17 @@ public class HazelcastDistributedInstance< K, V extends ServiceDescription > imp
     }
 
     @Override
-    public BlockingQueue< V > getQueue( String name ) {
+    public < E, A > IMap< E, A > getGenericMap( String name ) {
+        return instance.getMap( name );
+    }
+
+    @Override
+    public IQueue< V > getQueue( String name ) {
+        return instance.getQueue( name );
+    }
+
+    @Override
+    public < A > IQueue< A > getGenericQueue( String name ) {
         return instance.getQueue( name );
     }
 

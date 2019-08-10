@@ -40,7 +40,7 @@ public class ServicesController {
             return ResponseEntity.ok( description );
         }
 
-        description.setId( "" ).setEnabled( false );
+        description.setId( "" ).setEnabled( false ).setActive( false );
         return ResponseEntity.status( HttpStatus.REQUEST_TIMEOUT ).body( null );
     }
 

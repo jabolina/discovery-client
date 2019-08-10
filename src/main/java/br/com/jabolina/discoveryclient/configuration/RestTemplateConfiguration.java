@@ -34,9 +34,9 @@ public class RestTemplateConfiguration {
     public HttpComponentsClientHttpRequestFactory clientHttpRequestFactory( Environment environment )
             throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setConnectionRequestTimeout( Integer.parseInt( environment.getProperty( "webdav.connectionRequestTimeout", "5000" ) ) );
-        factory.setConnectTimeout( Integer.parseInt( environment.getProperty( "webdav.connectionTimeout", "5000" ) ) );
-        factory.setReadTimeout( Integer.parseInt( environment.getProperty( "webdav.readTimeout", "5000" ) ) );
+        factory.setConnectionRequestTimeout( 5000 );
+        factory.setConnectTimeout( 5000 );
+        factory.setReadTimeout( 5000 );
         factory.setHttpClient( httpClient() );
 
         return factory;

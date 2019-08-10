@@ -19,5 +19,8 @@ public interface DistributedInstance< I, K, V extends ServiceDescription > exten
 
     Lock getLock( String name );
     ConcurrentMap< K, V > getMap( String name );
+    < E, A > ConcurrentMap< E, A > getGenericMap( String name );
+
     BlockingQueue< V > getQueue( String name );
+    < A > BlockingQueue< A > getGenericQueue( String name );
 }
