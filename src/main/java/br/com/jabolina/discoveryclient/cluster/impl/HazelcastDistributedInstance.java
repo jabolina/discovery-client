@@ -9,8 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PreDestroy;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 public class HazelcastDistributedInstance< K, V extends ServiceDescription > implements DistributedInstance< HazelcastInstance, K, V > {
 
@@ -41,6 +42,26 @@ public class HazelcastDistributedInstance< K, V extends ServiceDescription > imp
     @Override
     public boolean isRunning() {
         return instance.getLifecycleService().isRunning();
+    }
+
+    @Override
+    public void runWithLock( String lockName, Runnable runnable ) {
+        ILock lock = null;
+
+        try {
+            lock = getLock( lockName );
+            lock.tryLock( 5L, TimeUnit.SECONDS );
+
+            if ( lock.isLocked() ) {
+                runnable.run();
+            }
+        } catch ( InterruptedException e ) {
+            LOGGER.error( "Error running with lock [{}]", lockName, e );
+        } finally {
+            if ( !Objects.isNull( lock ) && ( lock.isLocked() || lock.isLockedByCurrentThread() ) ) {
+                lock.forceUnlock();
+            }
+        }
     }
 
     @Override

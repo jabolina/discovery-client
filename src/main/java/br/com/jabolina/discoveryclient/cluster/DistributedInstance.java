@@ -15,6 +15,8 @@ public interface DistributedInstance< I, K, V extends ServiceDescription > exten
     void destroy();
     boolean isRunning();
 
+    void runWithLock( String lockName, Runnable runnable );
+
     Lock getLock( String name );
     ConcurrentMap< K, V > getMap( String name );
     BlockingQueue< V > getQueue( String name );

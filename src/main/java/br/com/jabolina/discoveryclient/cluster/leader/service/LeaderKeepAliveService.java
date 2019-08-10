@@ -53,9 +53,9 @@ public class LeaderKeepAliveService {
             );
 
             LOGGER.info( "Service verification response [{}]", res );
-            service.setEnabled( true );
+            service.setActive( true );
         } catch ( Exception ex ) {
-            service.setEnabled( false );
+            service.setActive( false );
         }
 
         return service;
@@ -64,26 +64,12 @@ public class LeaderKeepAliveService {
     @SuppressWarnings( "unchecked" )
     private <S extends ServiceDescription> void keepAlive() {
         if ( distributedInstance.isLeader() ) {
-            boolean locked = false;
-            Lock lock = null;
-
-            try {
-                lock = distributedInstance.getLock( Constants.HAZEL_LOCK_VERIFY );
-                locked = lock.tryLock(  5L, TimeUnit.SECONDS );
-
-                if ( locked ) {
-                    ConcurrentMap< String, S > map = distributedInstance.getMap( Constants.HAZEL_MAP_SERVICES );
-                    map.entrySet().parallelStream()
-                            .map( entry -> this.verifyService( entry.getValue() ) )
-                            .forEach( s -> map.replace( s.getId(), s ) );
-                }
-            } catch ( Exception ex ) {
-                LOGGER.error( "Error verifying services", ex );
-            } finally {
-                if ( !Objects.isNull( lock ) && locked ) {
-                    lock.unlock();
-                }
-            }
+            distributedInstance.runWithLock( Constants.HAZEL_LOCK_VERIFY, () -> {
+                ConcurrentMap< String, S > map = distributedInstance.getMap( Constants.HAZEL_MAP_SERVICES );
+                map.entrySet().parallelStream()
+                        .map( entry -> this.verifyService( entry.getValue() ) )
+                        .forEach( s -> map.replace( s.getId(), s ) );
+            } );
         }
     }
 

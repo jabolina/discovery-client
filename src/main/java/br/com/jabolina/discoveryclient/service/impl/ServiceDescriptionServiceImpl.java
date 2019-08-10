@@ -58,15 +58,18 @@ public class ServiceDescriptionServiceImpl< V extends ServiceDescription > imple
     @Override
     public boolean subscribe( V service ) {
         service.setId( EncDec.jid( service.getName(), Constants.HAZEL_MAP_SERVICES ) )
-                .setEnabled( true );
+                .setEnabled( true ).setActive( true );
         return offer( service );
     }
 
     @Override
     public boolean unsubscribe( String identifier ) {
-        // Thread safe?
-        V service = instance.getMap( Constants.HAZEL_MAP_SERVICES ).get( identifier );
-        service.disable();
-        return instance.getMap( Constants.HAZEL_MAP_SERVICES ).replace( identifier, service ) != null;
+        instance.runWithLock( Constants.HAZEL_LOCK_VERIFY, () -> {
+            V service = instance.getMap( Constants.HAZEL_MAP_SERVICES ).get( identifier );
+            service.disable();
+            instance.getMap( Constants.HAZEL_MAP_SERVICES ).replace( identifier, service );
+        } );
+
+        return instance.getMap( Constants.HAZEL_MAP_SERVICES ).get( identifier ) != null;
     }
 }

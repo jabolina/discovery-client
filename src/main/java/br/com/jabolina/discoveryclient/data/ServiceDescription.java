@@ -9,6 +9,7 @@ public class ServiceDescription implements Serializable {
     private String name;
     private String baseUrl;
     private boolean enabled;
+    private boolean active;
 
     public String getId() {
         return id;
@@ -49,6 +50,15 @@ public class ServiceDescription implements Serializable {
     public boolean disable() {
         this.enabled = false;
         return true;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public ServiceDescription setActive( boolean active ) {
+        this.active = active;
+        return this;
     }
 
     @Override
