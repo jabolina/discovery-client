@@ -1,9 +1,9 @@
 package br.com.jabolina.discoveryclient.configuration;
 
 import br.com.jabolina.discoveryclient.cluster.DistributedInstance;
-import br.com.jabolina.discoveryclient.cluster.impl.HazelcastDistributedInstance;
-import br.com.jabolina.discoveryclient.cluster.impl.MapEntryListener;
-import br.com.jabolina.discoveryclient.cluster.impl.MemberListener;
+import br.com.jabolina.discoveryclient.cluster.impl.hazelcast.HazelcastDistributedInstance;
+import br.com.jabolina.discoveryclient.cluster.impl.hazelcast.MapEntryListener;
+import br.com.jabolina.discoveryclient.cluster.impl.hazelcast.MemberListener;
 import br.com.jabolina.discoveryclient.util.Constants;
 import com.hazelcast.config.*;
 import com.hazelcast.core.MembershipListener;

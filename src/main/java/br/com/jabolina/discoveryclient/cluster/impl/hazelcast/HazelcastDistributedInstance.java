@@ -1,4 +1,4 @@
-package br.com.jabolina.discoveryclient.cluster.impl;
+package br.com.jabolina.discoveryclient.cluster.impl.hazelcast;
 
 import br.com.jabolina.discoveryclient.cluster.DistributedInstance;
 import br.com.jabolina.discoveryclient.data.ServiceDescription;
@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.PreDestroy;
 import java.util.Objects;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 public class HazelcastDistributedInstance< K, V extends ServiceDescription > implements DistributedInstance< HazelcastInstance, K, V > {

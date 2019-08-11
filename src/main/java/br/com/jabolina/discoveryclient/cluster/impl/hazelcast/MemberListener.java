@@ -1,4 +1,4 @@
-package br.com.jabolina.discoveryclient.cluster.impl;
+package br.com.jabolina.discoveryclient.cluster.impl.hazelcast;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.MemberAttributeEvent;

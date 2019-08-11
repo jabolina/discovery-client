@@ -1,4 +1,4 @@
-package br.com.jabolina.discoveryclient.cluster.impl;
+package br.com.jabolina.discoveryclient.cluster.impl.hazelcast;
 
 import com.hazelcast.core.EntryEvent;
 import com.hazelcast.core.EntryListener;
@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 public class MapEntryListener< V > implements EntryListener< String, V > {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( MapEntryListener.class );
+
+    // TODO: evict iterators cache with services
 
     @Override
     public void entryAdded( EntryEvent< String, V > entryEvent ) {

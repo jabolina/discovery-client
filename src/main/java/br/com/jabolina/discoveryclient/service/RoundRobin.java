@@ -1,5 +1,6 @@
 package br.com.jabolina.discoveryclient.service;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -11,6 +12,12 @@ public class RoundRobin {
         return new Iterator< T >() {
             private List< T > mem = list;
             private int idx = 0;
+
+            public void add( T t ) {
+                mem.add( t );
+                Collections.shuffle( mem );
+                idx = 0;
+            }
 
             @Override
             public boolean hasNext() {
