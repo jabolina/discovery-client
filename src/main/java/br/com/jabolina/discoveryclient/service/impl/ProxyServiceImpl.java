@@ -7,6 +7,8 @@ import br.com.jabolina.discoveryclient.service.ProxyService;
 import br.com.jabolina.discoveryclient.service.RoundRobin;
 import br.com.jabolina.discoveryclient.service.ServiceGenericService;
 import br.com.jabolina.discoveryclient.util.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,37 +22,33 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 @Service
 public class ProxyServiceImpl extends HttpServlet implements ProxyService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger( ProxyServiceImpl.class );
+
+    private final DistributedInstance< ?, ?, ? extends ServiceDescription > distributedInstance;
     private final ServiceGenericService< ? extends ServiceDescription > serviceGenericService;
     private final RestTemplate restTemplate;
 
-    private final ConcurrentMap< String, Iterator< ? extends ServiceDescription > > roundRobinServices;
+    // TODO: fix inconsistency between replicas and itself
+    private final ConcurrentMap< String, Iterator< ? extends ServiceDescription > > iterators;
 
     @Autowired
     public ProxyServiceImpl(
             DistributedInstance< ?, ?, ? extends ServiceDescription > distributedInstance,
             ServiceGenericService< ? extends ServiceDescription > serviceGenericService, RestTemplate restTemplate
     ) {
-        // TODO: use IQueue overriding the iterator
-        this.roundRobinServices = distributedInstance.getGenericMap( Constants.ROUND_ROBIN_KEY );
+        this.distributedInstance = distributedInstance;
         this.serviceGenericService = serviceGenericService;
         this.restTemplate = restTemplate;
-    }
 
-    private ServiceDescription pollService( @NotNull String name ) {
-        if ( roundRobinServices.containsKey( name ) ) {
-            return roundRobinServices.get( name ).next();
-        }
-
-        Iterator< ? extends ServiceDescription > services = RoundRobin.toIterator( retrieveServicesByName( name ) );
-
-        roundRobinServices.put( name, services );
-        return pollService( name );
+        this.iterators = new ConcurrentHashMap<>();
     }
 
     private List< ? extends ServiceDescription > retrieveServicesByName( String name ) {
@@ -58,6 +56,24 @@ public class ProxyServiceImpl extends HttpServlet implements ProxyService {
                 .filter( ServiceDescription::isEnabled )
                 .filter( ServiceDescription::isActive )
                 .collect( Collectors.toList() );
+    }
+
+    @SuppressWarnings( "unchecked" )
+    private Iterator< ? extends ServiceDescription > getServiceIterator( String name ) {
+        BlockingQueue cachedQueue = distributedInstance.getQueue( Constants.ROUND_ROBIN_KEY + name );
+
+        if ( cachedQueue.isEmpty() && !iterators.containsKey( name ) ) {
+            List< ? extends ServiceDescription > values = retrieveServicesByName( name );
+            cachedQueue.addAll( values );
+            iterators.put( name, RoundRobin.toIterator( values ) );
+        }
+
+        return iterators.get( name );
+    }
+
+    private ServiceDescription pollService( @NotNull String name ) {
+        Iterator< ? extends ServiceDescription > services = getServiceIterator( name );
+        return services.next();
     }
 
     private HttpHeaders exchangeHeaders( HttpServletRequest request ) {
@@ -71,6 +87,8 @@ public class ProxyServiceImpl extends HttpServlet implements ProxyService {
     private ResponseEntity proxy( HttpServletRequest request, ServiceDescription service ) throws IOException {
         Scanner s = new Scanner( request.getInputStream() ).useDelimiter( "\\A" );
         String uri = service.getBaseUrl() + request.getRequestURI();
+
+        LOGGER.info( "Proxying [{}]:[{}]", request.getMethod(), uri );
 
         return restTemplate.exchange(
                 uri,
@@ -87,7 +105,8 @@ public class ProxyServiceImpl extends HttpServlet implements ProxyService {
         ServiceDescription service = pollService( name );
 
         if ( Objects.isNull( service ) ) {
-            throw new ServiceNotFoundException( String.format( "Service with name [%s] not found", name ) );
+            throw new ServiceNotFoundException( String.format( "Service with name [%s] not found", name ) )
+                    .setCode( "SERVICE_NOT_FOUND" ).setStatus( 404 );
         }
 
         return proxy( request, service );

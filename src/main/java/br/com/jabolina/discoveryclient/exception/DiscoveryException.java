@@ -12,6 +12,7 @@ public class DiscoveryException extends RuntimeException {
 
     public DiscoveryException( String message ) {
         super( message );
+        this.message = message;
     }
 
     public DiscoveryException( String message, Throwable thrown ) {

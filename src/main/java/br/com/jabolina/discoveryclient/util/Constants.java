@@ -8,6 +8,6 @@ public final class Constants {
     public static final String HAZEL_MAP_SERVICES = "hazel-map-services-";
     public static final String HAZEL_QUEUE_SERVICES = "hazel-queue-services-";
     public static final String HAZEL_LOCK_VERIFY = "hazel-services-lock";
-    public static final String ROUND_ROBIN_KEY = "round-robin-services";
+    public static final String ROUND_ROBIN_KEY = "round-robin-services-";
 
 }

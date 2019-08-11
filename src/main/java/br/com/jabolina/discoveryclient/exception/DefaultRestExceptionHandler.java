@@ -13,10 +13,10 @@ public class DefaultRestExceptionHandler {
     public ResponseEntity< DefaultException > handleServiceNotFoundException( ServiceNotFoundException ex ) {
         return new ResponseEntity<>(
                 new DefaultException()
-                        .setMessage( ex.getStackTrace().toString() )
+                        .setMessage( ex.getMessage() )
                         .setStatus( ex.getStatus() )
-                        .setTitle( ex.getLocalizedMessage() ),
-                HttpStatus.valueOf( ex.getCode() )
+                        .setTitle( ex.getCode() ),
+                HttpStatus.NOT_FOUND
         );
     }
 }

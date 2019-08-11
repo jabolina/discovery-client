@@ -22,6 +22,10 @@ public class RoundRobin {
 
             @Override
             public T next() {
+                if ( mem.isEmpty() ) {
+                    return null;
+                }
+
                 T t = mem.get( idx );
                 idx = ( idx + 1 ) % mem.size();
 
