@@ -1,5 +1,6 @@
 package br.com.jabolina.discoveryclient.configuration;
 
+import br.com.jabolina.discoveryclient.exception.DefaultRestErrorHandler;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -26,6 +27,7 @@ public class RestTemplateConfiguration {
     public RestTemplate restTemplate( Environment environment ) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         RestTemplate restTemplate = new RestTemplate( clientHttpRequestFactory( environment ) );
         restTemplate.getMessageConverters().add( new ByteArrayHttpMessageConverter() );
+        restTemplate.setErrorHandler( new DefaultRestErrorHandler() );
 
         return restTemplate;
     }
