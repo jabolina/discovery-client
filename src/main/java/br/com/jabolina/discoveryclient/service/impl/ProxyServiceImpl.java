@@ -5,9 +5,13 @@ import br.com.jabolina.discoveryclient.data.ServiceDescription;
 import br.com.jabolina.discoveryclient.exception.ServiceNotFoundException;
 import br.com.jabolina.discoveryclient.service.ProxyService;
 import br.com.jabolina.discoveryclient.service.RoundRobin;
+import br.com.jabolina.discoveryclient.service.ServiceGenericService;
 import br.com.jabolina.discoveryclient.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -22,7 +26,7 @@ import java.util.stream.Collectors;
 @Service
 public class ProxyServiceImpl extends HttpServlet implements ProxyService {
 
-    private final DistributedInstance< ?, ?, ? extends ServiceDescription > distributedInstance;
+    private final ServiceGenericService< ? extends ServiceDescription > serviceGenericService;
     private final RestTemplate restTemplate;
 
     private final ConcurrentMap< String, Iterator< ? extends ServiceDescription > > roundRobinServices;
@@ -30,10 +34,11 @@ public class ProxyServiceImpl extends HttpServlet implements ProxyService {
     @Autowired
     public ProxyServiceImpl(
             DistributedInstance< ?, ?, ? extends ServiceDescription > distributedInstance,
-            RestTemplate restTemplate
+            ServiceGenericService< ? extends ServiceDescription > serviceGenericService, RestTemplate restTemplate
     ) {
-        this.distributedInstance = distributedInstance;
+        // TODO: use IQueue overriding the iterator
         this.roundRobinServices = distributedInstance.getGenericMap( Constants.ROUND_ROBIN_KEY );
+        this.serviceGenericService = serviceGenericService;
         this.restTemplate = restTemplate;
     }
 
@@ -49,8 +54,7 @@ public class ProxyServiceImpl extends HttpServlet implements ProxyService {
     }
 
     private List< ? extends ServiceDescription > retrieveServicesByName( String name ) {
-        return distributedInstance.getMap( Constants.HAZEL_MAP_SERVICES ).values().parallelStream()
-                .filter( service -> service.getName().equals( name ) )
+        return serviceGenericService.listServicesByName( name ).parallelStream()
                 .filter( ServiceDescription::isEnabled )
                 .filter( ServiceDescription::isActive )
                 .collect( Collectors.toList() );

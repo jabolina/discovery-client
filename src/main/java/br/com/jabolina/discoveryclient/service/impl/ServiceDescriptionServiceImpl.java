@@ -47,6 +47,13 @@ public class ServiceDescriptionServiceImpl< V extends ServiceDescription > imple
     }
 
     @Override
+    public List< V > listServicesByName( String name ) {
+        return instance.getMap( Constants.HAZEL_MAP_SERVICES ).values().parallelStream()
+                .filter( service -> service.getName().equals( name ) )
+                .collect( Collectors.toList() );
+    }
+
+    @Override
     public List< V > listServices() {
         return instance.getMap( Constants.HAZEL_MAP_SERVICES ).entrySet().parallelStream()
                 .filter( entry -> entry.getValue().isEnabled() )

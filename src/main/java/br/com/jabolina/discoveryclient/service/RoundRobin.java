@@ -9,15 +9,11 @@ public class RoundRobin {
     private RoundRobin() { }
 
     public static <T> Iterator<T> toIterator( List<T> list ) {
+        Collections.shuffle( list );
+
         return new Iterator< T >() {
             private List< T > mem = list;
             private int idx = 0;
-
-            public void add( T t ) {
-                mem.add( t );
-                Collections.shuffle( mem );
-                idx = 0;
-            }
 
             @Override
             public boolean hasNext() {

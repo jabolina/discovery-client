@@ -84,6 +84,7 @@ public class ServiceDescription implements Serializable {
                 ", name='" + name + '\'' +
                 ", baseUrl='" + baseUrl + '\'' +
                 ", enabled=" + enabled +
+                ", active=" + active +
                 '}';
     }
 }
