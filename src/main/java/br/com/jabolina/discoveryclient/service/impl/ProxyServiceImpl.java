@@ -2,6 +2,7 @@ package br.com.jabolina.discoveryclient.service.impl;
 
 import br.com.jabolina.discoveryclient.cluster.DistributedInstance;
 import br.com.jabolina.discoveryclient.data.ServiceDescription;
+import br.com.jabolina.discoveryclient.exception.ServiceNotFoundException;
 import br.com.jabolina.discoveryclient.service.ProxyService;
 import br.com.jabolina.discoveryclient.service.RoundRobin;
 import br.com.jabolina.discoveryclient.util.Constants;
@@ -78,10 +79,11 @@ public class ProxyServiceImpl extends HttpServlet implements ProxyService {
 
     @Override
     public ResponseEntity proxyRequest( HttpServletRequest request ) throws IOException {
-        ServiceDescription service = pollService( request.getParameter( "name" ) );
+        String name = request.getParameter( "name" );
+        ServiceDescription service = pollService( name );
 
         if ( Objects.isNull( service ) ) {
-            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( null );
+            throw new ServiceNotFoundException( String.format( "Service with name [%s] not found", name ) );
         }
 
         return proxy( request, service );
