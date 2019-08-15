@@ -1,6 +1,6 @@
 package br.com.jabolina.discoveryclient.configuration;
 
-import br.com.jabolina.discoveryclient.cluster.DistributedInstance;
+import br.com.jabolina.discoveryclient.cluster.IDistributedInstance;
 import br.com.jabolina.discoveryclient.cluster.impl.hazelcast.HazelcastDistributedInstance;
 import br.com.jabolina.discoveryclient.cluster.impl.hazelcast.MapEntryListener;
 import br.com.jabolina.discoveryclient.cluster.impl.hazelcast.MemberListener;
@@ -80,7 +80,7 @@ public class HazelcastConfiguration {
     }
 
     @Bean( name = "custom-hazelcast" )
-    public DistributedInstance hazelcastInstance() {
+    public IDistributedInstance hazelcastInstance() {
         return new HazelcastDistributedInstance( HazelcastInstanceFactory.newHazelcastInstance( config() ) );
     }
 }

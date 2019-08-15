@@ -1,11 +1,13 @@
 package br.com.jabolina.discoveryclient.service;
 
+import br.com.jabolina.discoveryclient.data.ServiceDescription;
+
 import java.util.List;
 
-public interface ServiceGenericService< V > {
+public interface ServiceGenericService {
 
-    List< V > listServicesByName( String name );
-    List< V > listServices();
-    boolean subscribe( V service );
+    List< ServiceDescription > listServicesByName( String name );
+    List< ServiceDescription > listServices();
+    boolean subscribe( ServiceDescription service );
     boolean unsubscribe( String service );
 }

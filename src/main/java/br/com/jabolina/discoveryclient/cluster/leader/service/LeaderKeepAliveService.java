@@ -1,6 +1,6 @@
 package br.com.jabolina.discoveryclient.cluster.leader.service;
 
-import br.com.jabolina.discoveryclient.cluster.DistributedInstance;
+import br.com.jabolina.discoveryclient.cluster.IDistributedInstance;
 import br.com.jabolina.discoveryclient.data.ServiceDescription;
 import br.com.jabolina.discoveryclient.util.Constants;
 import org.slf4j.Logger;
@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 
 @Service
 public class LeaderKeepAliveService {
@@ -29,12 +28,12 @@ public class LeaderKeepAliveService {
     private static final String SERVICE_HEALTH_PATH = "/discovery/health";
 
     private final ScheduledExecutorService executorService;
-    private final DistributedInstance distributedInstance;
+    private final IDistributedInstance distributedInstance;
     private final RestTemplate restTemplate;
 
     @Autowired
     public LeaderKeepAliveService(
-            DistributedInstance< ?, ?, ? > distributedInstance,
+            IDistributedInstance distributedInstance,
             RestTemplate restTemplate
     ) {
         this.distributedInstance = distributedInstance;
@@ -61,7 +60,6 @@ public class LeaderKeepAliveService {
         return service;
     }
 
-    @SuppressWarnings( "unchecked" )
     private <S extends ServiceDescription> void keepAlive() {
         if ( distributedInstance.isLeader() ) {
             distributedInstance.runWithLock( Constants.HAZEL_LOCK_VERIFY, () -> {

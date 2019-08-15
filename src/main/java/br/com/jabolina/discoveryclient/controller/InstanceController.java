@@ -1,6 +1,6 @@
 package br.com.jabolina.discoveryclient.controller;
 
-import br.com.jabolina.discoveryclient.cluster.DistributedInstance;
+import br.com.jabolina.discoveryclient.cluster.IDistributedInstance;
 import com.hazelcast.core.HazelcastInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +19,10 @@ import java.util.Map;
 public class InstanceController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( InstanceController.class );
-    private final DistributedInstance distributedInstance;
+    private final IDistributedInstance distributedInstance;
 
     @Autowired
-    public InstanceController( DistributedInstance distributedInstance ) {
+    public InstanceController( IDistributedInstance distributedInstance ) {
         this.distributedInstance = distributedInstance;
     }
 

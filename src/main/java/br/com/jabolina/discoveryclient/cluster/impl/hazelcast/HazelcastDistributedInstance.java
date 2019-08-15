@@ -1,7 +1,6 @@
 package br.com.jabolina.discoveryclient.cluster.impl.hazelcast;
 
-import br.com.jabolina.discoveryclient.cluster.DistributedInstance;
-import br.com.jabolina.discoveryclient.data.ServiceDescription;
+import br.com.jabolina.discoveryclient.cluster.IDistributedInstance;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ILock;
 import com.hazelcast.core.IMap;
@@ -13,7 +12,7 @@ import javax.annotation.PreDestroy;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class HazelcastDistributedInstance< K, V extends ServiceDescription > implements DistributedInstance< HazelcastInstance, K, V > {
+public class HazelcastDistributedInstance implements IDistributedInstance {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( HazelcastDistributedInstance.class );
 
@@ -25,6 +24,7 @@ public class HazelcastDistributedInstance< K, V extends ServiceDescription > imp
     }
 
     @Override
+    @SuppressWarnings( "unchecked" )
     public HazelcastInstance retrieveInstance() {
         return instance;
     }
@@ -70,22 +70,12 @@ public class HazelcastDistributedInstance< K, V extends ServiceDescription > imp
     }
 
     @Override
-    public IMap< K, V > getMap( String name ) {
+    public < K, V > IMap< K, V > getMap( String name ) {
         return instance.getMap( name );
     }
 
     @Override
-    public < E, A > IMap< E, A > getGenericMap( String name ) {
-        return instance.getMap( name );
-    }
-
-    @Override
-    public IQueue< V > getQueue( String name ) {
-        return instance.getQueue( name );
-    }
-
-    @Override
-    public < A > IQueue< A > getGenericQueue( String name ) {
+    public < V > IQueue< V > getQueue( String name ) {
         return instance.getQueue( name );
     }
 

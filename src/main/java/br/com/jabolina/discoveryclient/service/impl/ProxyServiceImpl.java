@@ -30,13 +30,13 @@ public class ProxyServiceImpl extends HttpServlet implements ProxyService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( ProxyServiceImpl.class );
 
-    private final ServiceGenericService< ? extends ServiceDescription > serviceGenericService;
+    private final ServiceGenericService serviceGenericService;
     private final DistributedRoundRobin roundRobin;
     private final RestTemplate restTemplate;
 
     @Autowired
     public ProxyServiceImpl(
-            ServiceGenericService< ? extends ServiceDescription > serviceGenericService,
+            ServiceGenericService serviceGenericService,
             DistributedRoundRobin roundRobin,
             RestTemplate restTemplate
     ) {

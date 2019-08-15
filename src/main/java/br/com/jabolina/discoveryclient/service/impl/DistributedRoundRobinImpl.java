@@ -1,6 +1,6 @@
 package br.com.jabolina.discoveryclient.service.impl;
 
-import br.com.jabolina.discoveryclient.cluster.DistributedInstance;
+import br.com.jabolina.discoveryclient.cluster.IDistributedInstance;
 import br.com.jabolina.discoveryclient.service.DistributedRoundRobin;
 import br.com.jabolina.discoveryclient.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +15,8 @@ public class DistributedRoundRobinImpl implements DistributedRoundRobin {
     private ConcurrentMap< String, Integer > indexes;
 
     @Autowired
-    public DistributedRoundRobinImpl( DistributedInstance< ?, ?, ? > distributedInstance ) {
-        this.indexes = distributedInstance.getGenericMap( Constants.ROUND_ROBIN_KEY );
+    public DistributedRoundRobinImpl( IDistributedInstance distributedInstance ) {
+        this.indexes = distributedInstance.getMap( Constants.ROUND_ROBIN_KEY );
     }
 
     private Integer nextIndex( List< ? > list, String name ) {

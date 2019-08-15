@@ -1,6 +1,6 @@
 package br.com.jabolina.discoveryclient.service.impl;
 
-import br.com.jabolina.discoveryclient.cluster.DistributedInstance;
+import br.com.jabolina.discoveryclient.cluster.IDistributedInstance;
 import br.com.jabolina.discoveryclient.data.ServiceDescription;
 import br.com.jabolina.discoveryclient.service.ServiceGenericService;
 import br.com.jabolina.discoveryclient.util.Constants;
@@ -14,16 +14,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
-public class ServiceDescriptionServiceImpl< V extends ServiceDescription > implements ServiceGenericService< V > {
+public class ServiceDescriptionServiceImpl implements ServiceGenericService {
 
-    private final DistributedInstance< ?, String, V > instance;
+    private final IDistributedInstance instance;
 
     @Autowired
-    public ServiceDescriptionServiceImpl( DistributedInstance< ?, String, V > instance ) {
+    public ServiceDescriptionServiceImpl( IDistributedInstance instance ) {
        this.instance = instance;
     }
 
-    private boolean offer( V description, long timeout, int tries ) {
+    private boolean offer( ServiceDescription description, long timeout, int tries ) {
         if ( tries > 0 ) {
             try {
                 if ( !instance.getQueue( Constants.HAZEL_QUEUE_SERVICES )
@@ -40,22 +40,22 @@ public class ServiceDescriptionServiceImpl< V extends ServiceDescription > imple
         return false;
     }
 
-    private boolean offer( V description ) {
+    private boolean offer( ServiceDescription description ) {
         instance.getMap( Constants.HAZEL_MAP_SERVICES )
                 .put( description.getId(), description );
         return true;
     }
 
     @Override
-    public List< V > listServicesByName( String name ) {
-        return instance.getMap( Constants.HAZEL_MAP_SERVICES ).values().parallelStream()
+    public List< ServiceDescription > listServicesByName( String name ) {
+        return instance.< String, ServiceDescription >getMap( Constants.HAZEL_MAP_SERVICES ).values().parallelStream()
                 .filter( service -> service.getName().equals( name ) )
                 .collect( Collectors.toList() );
     }
 
     @Override
-    public List< V > listServices() {
-        return instance.getMap( Constants.HAZEL_MAP_SERVICES ).entrySet().parallelStream()
+    public List< ServiceDescription > listServices() {
+        return instance.< String, ServiceDescription >getMap( Constants.HAZEL_MAP_SERVICES ).entrySet().parallelStream()
                 .filter( entry -> entry.getValue().isEnabled() )
                 .map( Map.Entry::getValue )
                 .collect( Collectors.toList() );
@@ -63,7 +63,7 @@ public class ServiceDescriptionServiceImpl< V extends ServiceDescription > imple
 
 
     @Override
-    public boolean subscribe( V service ) {
+    public boolean subscribe( ServiceDescription service ) {
         service.setId( EncDec.jid( service.getName(), Constants.HAZEL_MAP_SERVICES ) )
                 .setEnabled( true ).setActive( true );
         return offer( service );
@@ -72,7 +72,7 @@ public class ServiceDescriptionServiceImpl< V extends ServiceDescription > imple
     @Override
     public boolean unsubscribe( String identifier ) {
         instance.runWithLock( Constants.HAZEL_LOCK_VERIFY, () -> {
-            V service = instance.getMap( Constants.HAZEL_MAP_SERVICES ).get( identifier );
+            ServiceDescription service = instance.< String, ServiceDescription >getMap( Constants.HAZEL_MAP_SERVICES ).get( identifier );
             service.disable();
             instance.getMap( Constants.HAZEL_MAP_SERVICES ).replace( identifier, service );
         } );

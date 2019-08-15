@@ -18,10 +18,10 @@ public class ServicesController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( ServicesController.class );
 
-    private final ServiceGenericService< ServiceDescription > service;
+    private final ServiceGenericService service;
 
     @Autowired
-    public ServicesController( ServiceGenericService< ServiceDescription > service ) {
+    public ServicesController( ServiceGenericService service ) {
         this.service = service;
     }
 

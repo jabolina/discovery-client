@@ -1,7 +1,6 @@
 package br.com.jabolina.discoveryclient.cluster.leader.configuration;
 
-import br.com.jabolina.discoveryclient.cluster.DistributedInstance;
-import com.hazelcast.core.HazelcastInstance;
+import br.com.jabolina.discoveryclient.cluster.IDistributedInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,10 +14,10 @@ import org.springframework.integration.support.locks.LockRegistry;
 @DependsOn( "custom-hazelcast" )
 public class DistributedLeaderConfiguration {
 
-    private final DistributedInstance< HazelcastInstance, ?, ? > distributedInstance;
+    private final IDistributedInstance distributedInstance;
 
     @Autowired
-    public DistributedLeaderConfiguration( DistributedInstance< HazelcastInstance, ?, ? > distributedInstance ) {
+    public DistributedLeaderConfiguration( IDistributedInstance distributedInstance ) {
         this.distributedInstance = distributedInstance;
     }
 
