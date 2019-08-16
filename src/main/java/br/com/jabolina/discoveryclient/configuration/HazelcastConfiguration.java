@@ -88,7 +88,6 @@ public class HazelcastConfiguration {
     @Bean( "hazelcast-distributed-instance" )
     @Qualifier( "hazelcast-instance" )
     public IDistributedInstance hazelcastDistributedInstance() {
-        System.out.println("CHAMOU HAZELLLLLLLLLLL");
         return new HazelcastDistributedInstance( customHazelcastInstance() );
     }
 }

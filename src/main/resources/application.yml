@@ -4,8 +4,11 @@ discovery:
     cluster:
         size: 2
     distribution:
-        type: redis
+        type: hazelcast
     redis:
         address: 127.0.0.1:6379
 server:
     port: 8080
+spring:
+    autoconfigure:
+        exclude: org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration

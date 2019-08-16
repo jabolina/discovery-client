@@ -19,13 +19,11 @@ public class RedissonConfiguration {
         config.setCodec( new JsonJacksonCodec() );
         config.useSingleServer()
                 .setAddress( environment.getProperty( "discovery.redis.address" ) );
-        //
 
         return config;
     }
 
     private RedissonClient customRedissonClient( Environment environment ) {
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         return Redisson.create( redissonConfig( environment ) );
     }
 
@@ -33,7 +31,6 @@ public class RedissonConfiguration {
     @Bean( "redis-distributed-instance" )
     public IDistributedInstance redisDistributedInstance( Environment environment ) {
         if ( environment.getProperty( "discovery.distribution.type", "" ).equals( "redis" ) ) {
-            System.out.println("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
             return new RedisDistributedInstance( customRedissonClient( environment ) );
         }
 
