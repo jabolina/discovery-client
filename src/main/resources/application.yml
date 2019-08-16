@@ -1,0 +1,11 @@
+discovery:
+    address:
+        ip: 192.168.100.32
+    cluster:
+        size: 2
+    distribution:
+        type: redis
+    redis:
+        address: 127.0.0.1:6379
+server:
+    port: 8080

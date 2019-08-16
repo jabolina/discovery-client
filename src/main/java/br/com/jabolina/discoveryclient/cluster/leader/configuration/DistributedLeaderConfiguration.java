@@ -11,7 +11,7 @@ import org.springframework.integration.support.leader.LockRegistryLeaderInitiato
 import org.springframework.integration.support.locks.LockRegistry;
 
 @Configuration
-@DependsOn( "custom-hazelcast" )
+// @DependsOn( "custom-distributed-instance" )
 public class DistributedLeaderConfiguration {
 
     private final IDistributedInstance distributedInstance;
@@ -35,6 +35,7 @@ public class DistributedLeaderConfiguration {
 
     @Bean
     public LeaderInitiator leaderInitiator() {
+        System.out.println( distributedInstance.retrieveInstance().getClass().getName() );
         return new LeaderInitiator( distributedInstance.retrieveInstance() );
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
-@Component
+@Component( "context-bean-getter" )
 public class SpringContext implements ApplicationContextAware {
 
     public static ApplicationContext context;
@@ -18,6 +18,14 @@ public class SpringContext implements ApplicationContextAware {
         }
 
         return context.getBean( bean );
+    }
+
+    public static < T > T requireBean( Class< T > bean, String name ) {
+        if ( Objects.isNull( context ) ) {
+            return null;
+        }
+
+        return bean.cast( context.getBean( name ) );
     }
 
     @Override

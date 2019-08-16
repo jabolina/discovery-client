@@ -6,10 +6,12 @@ import br.com.jabolina.discoveryclient.cluster.impl.hazelcast.MapEntryListener;
 import br.com.jabolina.discoveryclient.cluster.impl.hazelcast.MemberListener;
 import br.com.jabolina.discoveryclient.util.Constants;
 import com.hazelcast.config.*;
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.MembershipListener;
 import com.hazelcast.instance.HazelcastInstanceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -79,8 +81,14 @@ public class HazelcastConfiguration {
         return config;
     }
 
-    @Bean( name = "custom-hazelcast" )
-    public IDistributedInstance hazelcastInstance() {
-        return new HazelcastDistributedInstance( HazelcastInstanceFactory.newHazelcastInstance( config() ) );
+    private HazelcastInstance customHazelcastInstance() {
+        return HazelcastInstanceFactory.newHazelcastInstance( config() );
+    }
+
+    @Bean( "hazelcast-distributed-instance" )
+    @Qualifier( "hazelcast-instance" )
+    public IDistributedInstance hazelcastDistributedInstance() {
+        System.out.println("CHAMOU HAZELLLLLLLLLLL");
+        return new HazelcastDistributedInstance( customHazelcastInstance() );
     }
 }
