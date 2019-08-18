@@ -14,7 +14,7 @@ import java.util.Objects;
 public class DistributedInstanceConfiguration {
 
     @Primary
-    @Bean( "custom-distributed-instance" )
+    @Bean( value = "custom-distributed-instance", destroyMethod = "destroy")
     public IDistributedInstance customDistributedInstance( Environment environment ) {
         String imdg = environment.getProperty( "discovery.distribution.type", "hazelcast" );
         return Objects.requireNonNull(

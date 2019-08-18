@@ -54,6 +54,7 @@ public class LeaderKeepAliveService {
             LOGGER.info( "Service verification response [{}]", res );
             service.setActive( true );
         } catch ( Exception ex ) {
+            LOGGER.info( "Deactivating service [{}]", service );
             service.setActive( false );
         }
 
@@ -64,7 +65,7 @@ public class LeaderKeepAliveService {
         if ( distributedInstance.isLeader() ) {
             distributedInstance.runWithLock( Constants.HAZEL_LOCK_VERIFY, () -> {
                 ConcurrentMap< String, S > map = distributedInstance.getMap( Constants.HAZEL_MAP_SERVICES );
-                map.entrySet().parallelStream()
+                map.entrySet().stream()
                         .map( entry -> this.verifyService( entry.getValue() ) )
                         .forEach( s -> map.replace( s.getId(), s ) );
             } );

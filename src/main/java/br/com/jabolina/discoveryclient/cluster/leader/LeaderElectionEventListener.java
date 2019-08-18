@@ -35,7 +35,7 @@ public class LeaderElectionEventListener implements ApplicationListener< LeaderE
 
         if ( !Objects.isNull( instance ) ) {
             LOGGER.info( "New instance leader elected: [{}]", event );
-            event.getElectedLeader().elected();
+            instance.elected();
             keepAliveService.startServicesVerification();
         } else {
             leaderRevoked();
