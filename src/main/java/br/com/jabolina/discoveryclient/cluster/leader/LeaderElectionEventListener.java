@@ -1,41 +1,44 @@
 package br.com.jabolina.discoveryclient.cluster.leader;
 
 import br.com.jabolina.discoveryclient.cluster.IDistributedInstance;
+import br.com.jabolina.discoveryclient.cluster.leader.event.LeaderElectionEvent;
 import br.com.jabolina.discoveryclient.cluster.leader.service.LeaderKeepAliveService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
-import org.springframework.integration.leader.event.OnGrantedEvent;
-import org.springframework.integration.leader.event.OnRevokedEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
-public class LeaderElectionEventListener {
+public class LeaderElectionEventListener implements ApplicationListener< LeaderElectionEvent > {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( LeaderElectionEventListener.class );
-    private final IDistributedInstance distributedInstance;
     private final LeaderKeepAliveService keepAliveService;
 
     @Autowired
     public LeaderElectionEventListener(
-            IDistributedInstance distributedInstance,
             LeaderKeepAliveService keepAliveService
     ) {
-        this.distributedInstance = distributedInstance;
         this.keepAliveService = keepAliveService;
     }
 
-    @EventListener( OnGrantedEvent.class )
-    public void leaderElected( OnGrantedEvent event ) {
-        LOGGER.info( "New instance leader elected: [{}]", event );
-        distributedInstance.elected();
-        keepAliveService.startServicesVerification();
+    private void leaderRevoked() {
+        LOGGER.info( "Leader gave up");
+        keepAliveService.stop();
     }
 
-    @EventListener( OnRevokedEvent.class )
-    public void leaderRevoked( OnRevokedEvent event ) {
-        LOGGER.info( "Instance leader revoked: [{}]", event );
-        keepAliveService.stop();
+    @Override
+    public void onApplicationEvent( LeaderElectionEvent event) {
+        IDistributedInstance instance = event.getElectedLeader();
+
+        if ( !Objects.isNull( instance ) ) {
+            LOGGER.info( "New instance leader elected: [{}]", event );
+            event.getElectedLeader().elected();
+            keepAliveService.startServicesVerification();
+        } else {
+            leaderRevoked();
+        }
     }
 }
