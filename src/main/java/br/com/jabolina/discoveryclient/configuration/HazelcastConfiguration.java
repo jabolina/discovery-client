@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 import java.util.Collections;
 import java.util.UUID;
@@ -58,8 +59,7 @@ public class HazelcastConfiguration {
                 .setEntryListenerConfigs( Collections.singletonList( entryListener() ) );
     }
 
-    @Bean
-    public Config config() {
+    private Config config() {
         String node = UUID.randomUUID().toString();
         LOGGER.info( "Creating Hazelcast configuration for node [{}]", node );
 
@@ -87,7 +87,11 @@ public class HazelcastConfiguration {
 
     @Bean( "hazelcast-distributed-instance" )
     @Qualifier( "hazelcast-instance" )
-    public IDistributedInstance hazelcastDistributedInstance() {
-        return new HazelcastDistributedInstance( customHazelcastInstance() );
+    public IDistributedInstance hazelcastDistributedInstance( Environment environment ) {
+        if ( environment.getProperty( "discovery.distribution.type", "" ).equals( "hazelcast" ) ) {
+            return new HazelcastDistributedInstance( customHazelcastInstance() );
+        }
+
+        return null;
     }
 }

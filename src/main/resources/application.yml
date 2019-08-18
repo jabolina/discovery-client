@@ -4,7 +4,7 @@ discovery:
     cluster:
         size: 2
     distribution:
-        type: hazelcast
+        type: redis
     redis:
         address: 127.0.0.1:6379
 server:
