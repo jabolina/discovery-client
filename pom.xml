@@ -22,6 +22,7 @@
 		<spring.version>5.1.5.RELEASE</spring.version>
 		<spring.integration.version>1.0.0.RELEASE</spring.integration.version>
 		<redisson.version>3.3.0</redisson.version>
+		<atomix.version>3.0.6</atomix.version>
 	</properties>
 
 	<dependencies>
@@ -66,6 +67,18 @@
 			<groupId>org.redisson</groupId>
 			<artifactId>redisson</artifactId>
 			<version>${redisson.version}</version>
+		</dependency>
+
+		<!-- Atomix dependencies -->
+		<dependency>
+			<groupId>io.atomix</groupId>
+			<artifactId>atomix</artifactId>
+			<version>${atomix.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.atomix</groupId>
+			<artifactId>atomix-raft</artifactId>
+			<version>${atomix.version}</version>
 		</dependency>
 
     </dependencies>

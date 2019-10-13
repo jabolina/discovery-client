@@ -4,11 +4,17 @@ discovery:
     cluster:
         size: 2
     distribution:
-        type: redis
+        type: atomix
     redis:
         address: 127.0.0.1:6379
+    atomix:
+        name: ${server.address}:${server.port}
+        members: ${server.address}:8080, ${server.address}:8081, ${server.address}:8082
 server:
     port: 8080
+    address: 127.0.0.1
 spring:
     autoconfigure:
         exclude: org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+    application:
+        name: discovery-client

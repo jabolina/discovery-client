@@ -65,8 +65,8 @@ public class LeaderKeepAliveService {
         if ( distributedInstance.isLeader() ) {
             distributedInstance.runWithLock( Constants.HAZEL_LOCK_VERIFY, () -> {
                 ConcurrentMap< String, S > map = distributedInstance.getMap( Constants.HAZEL_MAP_SERVICES );
-                map.entrySet().stream()
-                        .map( entry -> this.verifyService( entry.getValue() ) )
+                map.values().stream()
+                        .map( this::verifyService )
                         .forEach( s -> map.replace( s.getId(), s ) );
             } );
         }

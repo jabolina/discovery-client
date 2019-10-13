@@ -15,9 +15,11 @@ public interface IDistributedInstance extends Context {
     boolean isRunning();
 
     void runWithLock( String lockName, Runnable runnable );
-
     Lock getLock( String name );
-    < K, V > ConcurrentMap< K, V > getMap( String name );
 
+    < K, V > ConcurrentMap< K, V > getMap( String name );
     < E > BlockingQueue< E > getQueue( String name );
+
+    < M, K, V > M getCustomMap( String name );
+    < Q, E > Q getCustomQueue( String name );
 }
