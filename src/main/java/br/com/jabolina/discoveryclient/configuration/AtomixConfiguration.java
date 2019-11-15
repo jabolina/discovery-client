@@ -24,6 +24,9 @@ import java.util.stream.Collectors;
 @Configuration
 public class AtomixConfiguration {
 
+    @Value( "${discovery.address.complete}" )
+    private String clusterAddr;
+
     @Value( "${discovery.atomix.members}" )
     private String[] members;
 
@@ -91,7 +94,7 @@ public class AtomixConfiguration {
         return Atomix.builder()
                 .withClusterId( clusterName )
                 .withMemberId( memberId( name ) )
-                .withAddress( name )
+                .withAddress( clusterAddr )
                 .withMembershipProvider( membershipProvider() )
                 .withManagementGroup( managementGroup() )
                 .withPartitionGroups( partitionGroup() )

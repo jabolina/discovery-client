@@ -1,6 +1,8 @@
 discovery:
     address:
-        ip: 192.168.100.32
+        ip: 127.0.0.1
+        port: 8080
+        complete: ${discovery.address.ip}:${discovery.address.port}
     cluster:
         size: 2
     distribution:
@@ -8,10 +10,10 @@ discovery:
     redis:
         address: 127.0.0.1:6379
     atomix:
-        name: ${server.address}:${server.port}
-        members: ${server.address}:8080, ${server.address}:8081, ${server.address}:8082
+        name: ${discovery.address.complete}
+        members: ${discovery.address.ip}:8080, ${discovery.address.ip}:8081, ${discovery.address.ip}:8082
 server:
-    port: 8080
+    port: 8090
     address: 127.0.0.1
 spring:
     autoconfigure:

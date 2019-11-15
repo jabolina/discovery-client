@@ -2,8 +2,8 @@ package br.com.jabolina.discoveryclient.cluster;
 
 import org.springframework.integration.leader.Context;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 
 public interface IDistributedInstance extends Context {
@@ -17,9 +17,7 @@ public interface IDistributedInstance extends Context {
     void runWithLock( String lockName, Runnable runnable );
     Lock getLock( String name );
 
-    < K, V > ConcurrentMap< K, V > getMap( String name );
-    < E > BlockingQueue< E > getQueue( String name );
+    < K, V > Map< K, V > getMap( String name );
+    < E > Queue< E > getQueue( String name );
 
-    < M, K, V > M getCustomMap( String name );
-    < Q, E > Q getCustomQueue( String name );
 }

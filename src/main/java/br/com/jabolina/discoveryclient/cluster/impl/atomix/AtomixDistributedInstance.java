@@ -1,14 +1,13 @@
 package br.com.jabolina.discoveryclient.cluster.impl.atomix;
 
 import br.com.jabolina.discoveryclient.cluster.IDistributedInstance;
-import com.google.errorprone.annotations.DoNotCall;
 import io.atomix.core.Atomix;
 import io.atomix.core.lock.AsyncDistributedLock;
+import io.atomix.core.map.DistributedMap;
+import io.atomix.core.queue.DistributedQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 
 @SuppressWarnings( "unchecked" )
@@ -65,25 +64,13 @@ public class AtomixDistributedInstance implements IDistributedInstance {
     }
 
     @Override
-    @DoNotCall
-    public < K, V > ConcurrentMap< K, V > getMap( String name ) {
-        return ( ConcurrentMap< K, V > ) helper.<K, V>getMap( name );
+    public < K, V > DistributedMap< K, V > getMap( String name ) {
+        return helper.getMap( name );
     }
 
     @Override
-    @DoNotCall
-    public < E > BlockingQueue< E > getQueue( String name ) {
-        return ( BlockingQueue< E >) helper.getQueue( name );
-    }
-
-    @Override
-    public < M, K, V > M getCustomMap( String name ) {
-        return ( M ) helper.<K, V >getMap( name );
-    }
-
-    @Override
-    public < Q, E > Q getCustomQueue( String name ) {
-        return ( Q ) helper.< E >getQueue( name ) ;
+    public < E > DistributedQueue< E > getQueue( String name ) {
+        return helper.getQueue( name );
     }
 
     @Override

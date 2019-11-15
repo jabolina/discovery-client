@@ -7,12 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
 
 @Service
 public class DistributedRoundRobinImpl implements DistributedRoundRobin {
 
-    private ConcurrentMap< String, Integer > indexes;
+    private Map< String, Integer > indexes;
 
     @Autowired
     public DistributedRoundRobinImpl( IDistributedInstance distributedInstance ) {

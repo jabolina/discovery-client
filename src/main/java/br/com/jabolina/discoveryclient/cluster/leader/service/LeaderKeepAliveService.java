@@ -12,8 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -64,7 +64,7 @@ public class LeaderKeepAliveService {
     private <S extends ServiceDescription> void keepAlive() {
         if ( distributedInstance.isLeader() ) {
             distributedInstance.runWithLock( Constants.HAZEL_LOCK_VERIFY, () -> {
-                ConcurrentMap< String, S > map = distributedInstance.getMap( Constants.HAZEL_MAP_SERVICES );
+                Map< String, S > map = distributedInstance.getMap( Constants.HAZEL_MAP_SERVICES );
                 map.values().stream()
                         .map( this::verifyService )
                         .forEach( s -> map.replace( s.getId(), s ) );

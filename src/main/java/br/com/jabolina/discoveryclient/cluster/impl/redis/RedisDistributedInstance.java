@@ -81,16 +81,6 @@ public class RedisDistributedInstance implements IDistributedInstance {
     }
 
     @Override
-    public < M, K, V > M getCustomMap( String name ) {
-        return ( M ) redissonInstance.< K, V>getMap( name );
-    }
-
-    @Override
-    public < Q, E > Q getCustomQueue( String name ) {
-        return ( Q ) redissonInstance.< E >getQueue( name );
-    }
-
-    @Override
     public boolean isLeader() {
         return leader;
     }

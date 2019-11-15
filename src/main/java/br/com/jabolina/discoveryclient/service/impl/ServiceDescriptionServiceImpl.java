@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,23 +20,6 @@ public class ServiceDescriptionServiceImpl implements ServiceGenericService {
     @Autowired
     public ServiceDescriptionServiceImpl( IDistributedInstance instance ) {
        this.instance = instance;
-    }
-
-    private boolean offer( ServiceDescription description, long timeout, int tries ) {
-        if ( tries > 0 ) {
-            try {
-                if ( !instance.getQueue( Constants.HAZEL_QUEUE_SERVICES )
-                        .offer( description, timeout, TimeUnit.SECONDS ) ) {
-                    return offer( description, timeout, tries - 1 );
-                }
-
-                return true;
-            } catch ( InterruptedException ignore ) {
-                return offer( description, timeout * 2L, tries - 1 );
-            }
-        }
-
-        return false;
     }
 
     private boolean offer( ServiceDescription description ) {
