@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
+@SuppressWarnings( "unchecked" )
 public class RedisDistributedInstance implements IDistributedInstance {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( RedisDistributedInstance.class );
@@ -24,7 +25,6 @@ public class RedisDistributedInstance implements IDistributedInstance {
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
     public RedissonClient retrieveInstance() {
         return redissonInstance;
     }

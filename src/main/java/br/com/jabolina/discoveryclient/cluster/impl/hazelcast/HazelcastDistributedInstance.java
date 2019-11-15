@@ -12,6 +12,7 @@ import javax.annotation.PreDestroy;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings( "unchecked" )
 public class HazelcastDistributedInstance implements IDistributedInstance {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( HazelcastDistributedInstance.class );
@@ -24,7 +25,6 @@ public class HazelcastDistributedInstance implements IDistributedInstance {
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
     public HazelcastInstance retrieveInstance() {
         return instance;
     }
